@@ -8,18 +8,50 @@ output:
 
 ## Loading and preprocessing the data
 
-
+```{r}
+dt <- read.csv("activity.csv", header = TRUE, stringsAsFactors = FALSE)
+dt$date <- as.Date(dt$date, "%Y-%m-%d")
+head(dt)
+```
 
 ## What is mean total number of steps taken per day?
+```{r}
+a <- aggregate(steps ~ date, dt, sum)
+hist(a$steps, xlab = "Steps", main = "Histogram of Steps in a day", col = "Red")
+     ```
 
-
+The average steps taken per day is 
+```{r} 
+mean(a$steps)
+``` 
+and the median is 
+```{r}
+median(a$steps)
+```
 
 ## What is the average daily activity pattern?
+```{r}
+a <- aggregate(steps ~ interval, dt, mean)
+plot(a$interval, a$steps, type = 'l', xlab = "Interval", ylab = "Mean steps")
+```
 
+The interval with maximum average number of steps across days is as follows.
+```{r}
+a$interval[a$steps == max(a$steps)]
+```
 
+## Inputing missing values
 
-## Imputing missing values
-
+The total number of missing steps data is calculated to be:
+```{r}
+sum(is.na(dt$steps))
+```
+To estimate the missing values, we use the average steps per interval on that day.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+wknd  <- weekdays(dt$date)=="Saturday"|weekdays(dt$date)=="Sunday"
+plot(dt$interval[wknd], dt$steps[wknd], type = "l")
+plot(dt$interval[!wknd], dt$steps[!wknd], type = "l")
+```
