@@ -46,12 +46,30 @@ The total number of missing steps data is calculated to be:
 ```{r}
 sum(is.na(dt$steps))
 ```
-To estimate the missing values, we use the average steps per interval on that day.
+To estimate the missing values, we use that intervals average across days.
+```{r}
+dt[is.na(dt$steps),]$steps <- a$steps[dt[is.na(dt$steps),]$interval == a$interval]
+a <- aggregate(steps ~ date, dt, sum)
+hist(a$steps, xlab = "Steps", main = "Histogram of Steps in a day", col = "Red")
+```
+Evaluating mean and median again:
 
+The average steps taken per day is 
+```{r} 
+mean(a$steps)
+``` 
+and the median is 
+```{r}
+median(a$steps)
+```
+The filling in of data has not affected the mean and medium significantly.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r}
 wknd  <- weekdays(dt$date)=="Saturday"|weekdays(dt$date)=="Sunday"
-plot(dt$interval[wknd], dt$steps[wknd], type = "l")
-plot(dt$interval[!wknd], dt$steps[!wknd], type = "l")
+dt$dow[wknd] <- "Weekend"
+dt$dow[!wknd] <- "Weekday"
+dt$dow <- as.factor(dt$dow)
+library(lattice)
+xyplot(steps~interval | dow, data = dt, layout = c(1,2), type = 'l')
 ```
